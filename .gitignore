@@ -1,2 +1,7 @@
 # common editor backups
 *~
+# TeX artifcts
+*.aux
+*.gz
+*.log
+*.out
