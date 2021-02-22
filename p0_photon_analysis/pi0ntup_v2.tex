@@ -1,0 +1,225 @@
+\documentclass[pdftex,12pt,letter]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{xspace}
+\usepackage{cite}
+\usepackage{url}
+\usepackage[pdftex,pdfpagelabels,bookmarks,hyperindex,hyperfigures]{hyperref}
+
+\newcommand{\sqsn}{\mbox{$\sqrt{s_{_{NN}}}$}\xspace}
+\newcommand{\piz}{\mbox{$\pi^0$}\xspace}
+\newcommand{\pt}{\mbox{$p_{\rm T}$}\xspace}
+\newcommand{\gev}{\mbox{GeV}\xspace}
+\newcommand{\gevc}{\mbox{GeV/$c$}\xspace}
+
+\title{Neutral meson and photon ntuples derived from PHENIX Data: explanation and examples}
+\date{\today}
+\author{G.\,David\\
+{ \it Stony Brook University, Brookhaven National Laboratory}}
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent  This writeup contains information about small samples of reconstructed $p$+Au
+data taken with the PHENIX detector in 2015 at \sqsn=200\,GeV. These samples were created
+for educational and training purposes only and are not at useable for deriving any physics
+results. A few analysis examples are provided with a focus on the Electromagnetic Calorimeter (EMCAL),
+as well as methods of identifying $\pi^0$-s and photons using that device.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+Data samples described in this paper contain
+information on {\it clusters} -- small, contiguous regions of energy
+deposit in the EMCal -- which are usually considered as 
+{\it energy deposited by one single particle}.  While this is not
+always true, this is our first working hypothesis, but we should
+always be aware that a cluster might contain energy from more than one
+particle.  Also, not all
+clusters correspond to photons; many are from hadrons, especially at
+low and very high \pt (transverse momentum)\footnote{This may sound
+  surprising in an electromagnetic calorimeter, but it is true: many
+  high \pt single clusters are actually from two overlapping photons
+  from a \piz decay, i.e. they are hadrons.
+}.  
+In fact, it's going to
+be your job to find selection criteria (``cuts'') which eliminate
+hadrons (the {\it contamination}) but still preserves most of the
+photons ({\it signal}) in the sample.
+
+As for \piz, recall that most of them decay via 
+$\pi^0 \rightarrow \gamma\gamma$, so they can be reconstructed from
+photon candidate {\it pairs} using the invariant mass
+$$ m_{\gamma\gamma} = \sqrt{2E_1E_2(1-cos(\theta))} $$
+where $E_1,E_2$ are the energies of the two photon candidates and
+$\theta$ is the {\it opening angle} between them.  Note that the \pt
+of the \piz is simply the vector sum of the \pt-s of the two photons
+paired. 
+
+Please note that -- as per PHENIX standards -- time is always given in
+nanoseconds, distance in centimeters and energy in GeV.
+
+
+\section{The Data:  {\it gnt} and {\it ggntuple} Ntuples}
+The two files {\it MBntup.root} and {\it ERTntup.root} are produced
+using a small fraction of the \sqsn=200\,GeV $p$+Au data collected by
+PHENIX in 2015.  They are published for educational purposes only.
+You will not be able to derive any publishable physics results from
+them, however, you can learn some basic techniques of
+particle identification (PID), practice how to make different cuts and
+estimate their effect, how the signal to background ratio can be
+improved at the expense of some loss in the signal and how to find an
+optimum between the two trends.  You may also learn that PID itself is
+also not an unambiguous procedure: you can apply much looser cuts on
+the ``photonness'' of the clusters when reconstructing \piz, because
+you identify the \piz by the {\it correlation} of the two ``photons'',
+namely, whether their invariant mass is in the expected range (around
+0.135\,\gev) or not.  Only photon pairs from the decay of the same
+\piz are truly correlated, random pairs of photons, photon-hadron or
+hadron-hadron pairs only rarely give invariant masses in the 
+``\piz window''.  Therefore, you can allow yourself to have more
+contamination is the ``photon'' sample -- and gain significant
+statistics in reconstructed \piz (why?).  --  On the other hand for
+reconstructing (inclusive) photons you don't have such a help: if you
+decide that a cluster is a photon, that's it.  In order to keep the
+contamination from misclassified hadrons you might want to make your
+photon PID cuts stricter, in order to increase {\it purity} 
+(in other terminology decrease {\it contamination}) at the
+expense of {\it efficiency}.
+
+The first Ntuple is called {\it ggntuple} (gamma-gamma ntuple) and
+contains information on EMCal cluster {\it pairs} and the two clusters
+in the pair (see Table~\ref{tab:ggntuple}).  In each event all
+clusters in a sector are paired with all other clusters, and the pair
+variables ({\it pt, costheta, phi, mass, asym}) calculated, even if
+they are obviously not photons from a \piz decay (for instance because
+their invariant mass is, say, 0.4\,\gev).  These ``obviously wrong''
+random pairs are called the {\it combinatorial background} and they
+help you to estimate the background in the \piz peak when you'll try
+to extract the number of \piz in the sample.
+The momenta attributed to a cluster (particle candidate) is calculated
+from the vector connecting the collision point ({\it vtxZ}) with the
+impact point on the EMCal, and under the assumption that the particle
+is a photon (i.e. $p=E$, the measured energy).  From these, the pair
+momentum {\it pt} is calculated as the vector sum of the transverse
+components; {\it costheta} is the cosine of the opening angle between
+the two momentum vectors, {\it phi} is the azimuth of the pair
+momentum (i.e. of the parent \piz), {\it mass} is the invariant mass
+calculated with the formula above, and {\it asym} is the energy
+asymmetry $\alpha$ of the two clusters
+$$\alpha = \frac{|E_1-E_2|}{E_1+E_2}$$
+The rest of the variables describe the two clusters ({\it 1,2}), their
+meaning is spelled out below.
+
+\begin{table}[h]
+  \begin{tabular}{|l|l|} \hline
+    Variable name & Description \\ \hline
+    cent & Event centrality \\
+    vtxZ & $z$-vertex of the event \\
+    pt   & Transverse momentum of cluster {\it pair} ($\pi^0$
+    candidate) \\
+    costheta & $cos$ of the opening angle between the two clusters \\    
+    phi & Azimuthal angle of the direction of the pair momentum
+    (assumed $\pi^0$) \\
+    mass & Invariant mass calculated from the two clusters (energy and
+    position) \\
+    asym & Energy asymmetry ($|E_1-E_2|/(E_1+E_2)$) of the two clusters \\
+    sec1 & EMCal sector where the first cluster is \\
+    Ecore1 & ``Core'' energy of the first cluster \\
+    tof1   & Time-of-flight of the first cluster \\
+    twrhit1 & Number of towers in the first cluster \\
+    prob1 & Probability that the first cluster is a photon (based on
+    $\chi^2$) \\
+    chisq1 & $\chi^2$ from expected photon shape for the first cluster
+    \\
+    stoch1 & Combined variable to describe ``photonness'' of first
+    cluster \\
+    sec2 & ...  Same quantities as above for the second cluster of the
+    pair \\ \hline
+  \end{tabular}
+  \vspace{0.3cm}
+  \caption{Fields in the $\gamma$-pair Ntuple ({\it ggntuple}).
+}
+  \label{tab:ggntuple}
+ \end{table}
+
+
+The second Ntuple is called {\it gnt} and contains information on
+individual clusters (again, many of which are {\it not} photons!).
+Here {\it pt} is the transverse momentum of the (single) particle,
+calculated under the assumption that it is a photon (straight path
+from the collision vertex and $p=E$), {\it costheta} is the cosine of
+the polar angle, {\it phi} is the azimuth, and {\it sec} is the sector
+number (0-5 are lead scintillator sectors, PbSc, 6-7 are lead glass,
+PbGl).  For both detectors the smallest, individually read out units
+are called {\it towers}.
+
+The field {\it ecore} is an estimate of the particle energy (using various
+corrections to account for detector effects), {\it ecent} is the
+energy in the central (highest energy) tower of the cluster, 
+{\it tof} is the time-of-flight measured in the central tower and
+corrected with the flight-path $s/c$ such that for photons {\it tof}
+is a distribution around zero.  Based on testbeam data we have a model
+(parametrization) of electromagnetic showers depending on energy, impact
+point and angle of the photon; the {\it chisq} is calculated as the
+deviation of the actual shower (energy deposit pattern in the towers)
+from the ``model'' shower of the same energy, impact point and angle.
+The {\it prob} is calculated from this $\chi^2$, usually showers with
+$prob>0.05$ are very likely indeed photons;  {\it disp} is the 2D
+dispersion, {\it twrhit} is the number of towers hit (i.e. included in
+the cluster), finally {\it stoch} is a combination of various
+probability measures to characterize ``photonness'', higher values
+mean higher probability that the cluster is indeed a photon.  The
+calculated impact point of the particle is given as $x,y,z$ in the
+PHENIX absolute coordinate system ($x>0$ is the West Arm, negative $z$
+is South).
+
+The {\it MBntup.root} file is produced from minimum bias data (although
+with a lower limit  \pt$>2.0$\,\gevc in {\it gnt} and pair \pt in
+{\it ggntuple}), whereas in {\it ERTntup.root} the threshold for 
+single cluster \pt in {\it gnt} is 8\,\gev, and the threshold for pair
+\pt in {\it ggntuple} is also 8\,\gev.  Note that since here we
+restrict only the pair \pt, the energy of the individual clusters can
+be (and often is) significantly lower.  Important: both the MB and the
+ERT {\it ggntuple}-s are written out with the condition that the
+asymmetry is less than 0.8.
+
+\begin{table}[h]
+  \begin{tabular}{|l|l|} \hline
+    Variable name & Description \\ \hline
+    cent & Event centrality \\
+    vtxZ & $z$-vertex of the event \\
+    pt   & Transverse momentum of the cluster ($\gamma$-candidate) \\
+    costheta & Polar angle of the cluster ($\gamma$-candidate) \\    
+    phi & Azimuthal angle of the cluster ($\gamma$-candidate) \\
+    sec & EMCal sector of the cluster ($\gamma$-candidate) \\
+    ecore & ``Core'' energy of the cluster ($\gamma$-candidate) \\
+    ecent & Energy in the central tower of the cluster ($\gamma$-candidate) \\
+    tof   & Time-of-flight in the central tower of the cluster ($\gamma$-candidate) \\
+    prob & Probability that the cluster is a photon (based on $\chi^2$) \\
+    disp & Dispersion of the cluster ($\gamma$-candidate) \\
+    chisq & $\chi^2$ from expected photon shape of the cluster ($\gamma$-candidate) \\
+    twrhit & Number of towers in the cluster ($\gamma$-candidate) \\
+    stoch & Combined variable to describe ``photonness'' of the cluster ($\gamma$-candidate) \\
+    x & $x$-position of impact point on the EMCal surface \\
+    y & $y$-position of impact point on the EMCal surface \\
+    z & $z$-position of impact point on the EMCal surface \\ \hline
+  \end{tabular}
+  \vspace{0.3cm}
+  \caption{Fields in the $\gamma$ Ntuple ({\it gnt}).
+}
+  \label{tab:gnt}
+ \end{table}
+\section{TBD...}
+
+
+
+
+\end{document}
+
+
+
