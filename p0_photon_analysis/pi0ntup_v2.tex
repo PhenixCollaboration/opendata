@@ -3,15 +3,25 @@
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{xspace}
+\usepackage{xcolor}
 \usepackage{cite}
 \usepackage{url}
 \usepackage[pdftex,pdfpagelabels,bookmarks,hyperindex,hyperfigures]{hyperref}
+\usepackage{listings}
+
+\lstset { %
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+
 
 \newcommand{\sqsn}{\mbox{$\sqrt{s_{_{NN}}}$}\xspace}
 \newcommand{\piz}{\mbox{$\pi^0$}\xspace}
 \newcommand{\pt}{\mbox{$p_{\rm T}$}\xspace}
 \newcommand{\gev}{\mbox{GeV}\xspace}
 \newcommand{\gevc}{\mbox{GeV/$c$}\xspace}
+\newcommand{\mgg}{\mbox{$m_{\gamma\gamma}$}\xspace}
 
 \title{Neutral meson and photon ntuples derived from PHENIX Data: explanation and examples}
 \date{\today}
@@ -23,17 +33,21 @@
 \maketitle
 
 \begin{abstract}
-\noindent  This writeup contains information about small samples of reconstructed $p$+Au
-data taken with the PHENIX detector in 2015 at \sqsn=200\,GeV. These samples were created
-for educational and training purposes only and are not at useable for deriving any physics
-results. A few analysis examples are provided with a focus on the Electromagnetic Calorimeter (EMCAL),
-as well as methods of identifying $\pi^0$-s and photons using that device.
+\noindent  This writeup is a part of an Analysis Preservation and educational
+ package with a focus  on the Electromagnetic Calorimeter (EMCal) of the PHENIX
+detector. It aims to present a few basic techniques
+of identifying $\pi^0$-s and photons using that device.
+The data component of this package is provided in the form of ROOT files
+containing small samples of reconstructed $p$+Au data taken with the PHENIX detector
+in 2015 at \sqsn=200\,GeV.  Both minimum bias and EMCal-triggered data are included.
+\textit{These samples were created for educational and training purposes only and are not at
+all useable for deriving any real physics results.}
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
-Data samples described in this paper contain
+Data samples described in this writeup contain
 information on {\it clusters} -- small, contiguous regions of energy
 deposit in the EMCal -- which are usually considered as 
 {\it energy deposited by one single particle}.  While this is not
@@ -41,15 +55,13 @@ always true, this is our first working hypothesis, but we should
 always be aware that a cluster might contain energy from more than one
 particle.  Also, not all
 clusters correspond to photons; many are from hadrons, especially at
-low and very high \pt (transverse momentum)\footnote{This may sound
-  surprising in an electromagnetic calorimeter, but it is true: many
-  high \pt single clusters are actually from two overlapping photons
-  from a \piz decay, i.e. they are hadrons.
-}.  
-In fact, it's going to
-be your job to find selection criteria (``cuts'') which eliminate
-hadrons (the {\it contamination}) but still preserves most of the
-photons ({\it signal}) in the sample.
+low and very high \pt (transverse momentum)\footnote{
+This may sound  surprising with regards to an electromagnetic calorimeter,
+but it is true: many   high \pt single clusters are actually from two
+overlapping photons  from a \piz decay, i.e. they are hadrons.}. 
+In fact, it's going to be your job in this exercise to find selection criteria (``cuts'')
+which eliminate hadrons (the {\it contamination}) but still preserves most of the
+photons (\textit{signal}) in the sample.
 
 As for \piz, recall that most of them decay via 
 $\pi^0 \rightarrow \gamma\gamma$, so they can be reconstructed from
@@ -63,17 +75,51 @@ paired.
 Please note that -- as per PHENIX standards -- time is always given in
 nanoseconds, distance in centimeters and energy in GeV.
 
+\section{Contents of the Package}
+The package described here contains
+\begin{itemize}
+\item this writeup
+\item four ROOT-formatted data files as described in Sec.\ref{data}
+\item two ROOT macros described in Sec.\ref{code}
+\end{itemize}
+
+\noindent
+The ROOT macros and this document (pi0ntup\_v2.pdf) can be located on GitHub:
+\begin{verbatim}
+https://github.com/PhenixCollaboration/opendata/tree/master/p0_photon_analysis
+\end{verbatim}
 
 \section{The Data:  {\it gnt} and {\it ggntuple} Ntuples}
-The two files {\it MBntup.root} and {\it ERTntup.root} are produced
+\label{data}
+\subsection{General comments about the data}
+
+There are a total of four files which are a part of the package
+in which this document is included:
+\textit{
+\begin{itemize}
+\item MBntup\_ggntuple.root
+\item ERTntup\_ggntuple.root
+\item MBntup\_gnt.root
+\item ERTntup\_gnt.root
+\end{itemize}
+}
+\noindent
+The \textit{"MB"} files correspond to the minimum bias data while the
+\textit{"ERT"} files are based on the EMCal-triggered data.
+The \textit{ggntuple} files contain information on the EMCal
+{\it cluster pairs} while \textit{gnt} files describe {\it single clusters}.
+
+These files were produced
 using a small fraction of the \sqsn=200\,GeV $p$+Au data collected by
 PHENIX in 2015.  They are published for educational purposes only.
 You will not be able to derive any publishable physics results from
-them, however, you can learn some basic techniques of
-particle identification (PID), practice how to make different cuts and
-estimate their effect, how the signal to background ratio can be
-improved at the expense of some loss in the signal and how to find an
-optimum between the two trends.  You may also learn that PID itself is
+them. Their purpose is to help you learn some basic techniques of
+particle identification (PID), practice making different cuts and
+estimate their effect, observe how the signal to background ratio
+can be improved at the expense of some loss in the signal and
+how to find an optimum between the two trends. 
+
+You may also learn that PID itself is
 also not an unambiguous procedure: you can apply much looser cuts on
 the ``photonness'' of the clusters when reconstructing \piz, because
 you identify the \piz by the {\it correlation} of the two ``photons'',
@@ -83,16 +129,17 @@ namely, whether their invariant mass is in the expected range (around
 hadron-hadron pairs only rarely give invariant masses in the 
 ``\piz window''.  Therefore, you can allow yourself to have more
 contamination is the ``photon'' sample -- and gain significant
-statistics in reconstructed \piz (why?).  --  On the other hand for
-reconstructing (inclusive) photons you don't have such a help: if you
+statistics in reconstructed \piz (why?).  On the other hand for
+reconstructing (inclusive) photons you don't have such help: if you
 decide that a cluster is a photon, that's it.  In order to keep the
 contamination from misclassified hadrons you might want to make your
 photon PID cuts stricter, in order to increase {\it purity} 
 (in other terminology decrease {\it contamination}) at the
 expense of {\it efficiency}.
 
-The first Ntuple is called {\it ggntuple} (gamma-gamma ntuple) and
-contains information on EMCal cluster {\it pairs} and the two clusters
+\subsection{The Gamma-Gamma Ntuples \it{(ggnutple)}}
+The first Ntuple type is called {\it ggntuple} (gamma-gamma Ntuple).
+It contains information on EMCal cluster {\it pairs} and the two clusters
 in the pair (see Table~\ref{tab:ggntuple}).  In each event all
 clusters in a sector are paired with all other clusters, and the pair
 variables ({\it pt, costheta, phi, mass, asym}) calculated, even if
@@ -142,13 +189,13 @@ meaning is spelled out below.
     pair \\ \hline
   \end{tabular}
   \vspace{0.3cm}
-  \caption{Fields in the $\gamma$-pair Ntuple ({\it ggntuple}).
+  \caption{Variables in the $\gamma$-pair Ntuple ({\it ggntuple} type).
 }
   \label{tab:ggntuple}
  \end{table}
 
-
-The second Ntuple is called {\it gnt} and contains information on
+\subsection{The Cluster Ntuples \it{(gnt)}}
+The second Ntuple type is called {\it gnt} and contains information on
 individual clusters (again, many of which are {\it not} photons!).
 Here {\it pt} is the transverse momentum of the (single) particle,
 calculated under the assumption that it is a photon (straight path
@@ -178,15 +225,16 @@ calculated impact point of the particle is given as $x,y,z$ in the
 PHENIX absolute coordinate system ($x>0$ is the West Arm, negative $z$
 is South).
 
-The {\it MBntup.root} file is produced from minimum bias data (although
-with a lower limit  \pt$>2.0$\,\gevc in {\it gnt} and pair \pt in
-{\it ggntuple}), whereas in {\it ERTntup.root} the threshold for 
+The {\it MB*.root} files are produced from minimum bias data (although
+with a lower limit  \mbox{\pt$>2.0$\,\gevc} in {\it gnt} and pair \pt in
+{\it ggntuple}), whereas in {\it ERT*.root} files the threshold for 
 single cluster \pt in {\it gnt} is 8\,\gev, and the threshold for pair
 \pt in {\it ggntuple} is also 8\,\gev.  Note that since here we
 restrict only the pair \pt, the energy of the individual clusters can
-be (and often is) significantly lower.  Important: both the MB and the
-ERT {\it ggntuple}-s are written out with the condition that the
-asymmetry is less than 0.8.
+be (and often is) significantly lower. 
+
+\textbf{Important:} data in both {\it MBntup\_ggntuple.root} and {\it ERTntup\_ggntuple.root}
+are subject to the condition that the asymmetry is less than 0.8.
 
 \begin{table}[h]
   \begin{tabular}{|l|l|} \hline
@@ -210,13 +258,399 @@ asymmetry is less than 0.8.
     z & $z$-position of impact point on the EMCal surface \\ \hline
   \end{tabular}
   \vspace{0.3cm}
-  \caption{Fields in the $\gamma$ Ntuple ({\it gnt}).
+  \caption{Variables in the single-cluster ($\gamma$) Ntuple (the {\it gnt} type).
 }
   \label{tab:gnt}
  \end{table}
-\section{TBD...}
+
+\section{Analyzing the Data}
+\label{code}
+
+\subsection{Access to the Code}
+The two ROOT macros named \textit{gamma\_gamma.C} and
+\textit{single\_cluster.C} can be downloaded from this GitHub location:
+\begin{verbatim}
+https://github.com/PhenixCollaboration/opendata/tree/master/p0_photon_analysis
+\end{verbatim}
+The macros were designed to be self-documenting and to produce a visually appealing
+result.
+In the following, we are using {\it paraphrased} fragments of the macros as the basis
+for commentary (i.e. they may differ a little for illustration purposes). Feel free to
+run modified snippets of the code to get a feel of how it works with the data.
+
+\subsection{Cluster Pairs (macro: \textit{gamma\_gamma.C})}
+\subsubsection{Effect of the $\chi^2$ cut on the invariant mass spectra}
+Below is a code sample demonstrating the effect of the $\chi^2$ cut.
+
+\begin{lstlisting}
+int W=900;
+int H=400;
+
+TFile* mb = new TFile("MBntup_ggntuple.root");
+TFile* ert = new TFile("ERTntup_ggntuple.root");
+
+TCanvas *canvas1  = new TCanvas("canvas1",  "Effect of the chi2 cut", W, H*3);
+canvas1->Divide(1,3);
+
+canvas1_1->Divide(2,1);
+canvas1_2->Divide(2,1);
+
+mb->cd();
+canvas1_1_1->cd();
+ggntuple->Draw("mass","mass<1.0");
+
+ert->cd();
+canvas1_1_2->cd();
+ggntuple->Draw("mass","mass<1.0");
+
+mb->cd();
+canvas1_2_1->cd();
+ggntuple->Draw("mass>>htemp1","mass<1.0");
+canvas1_2_2->cd();
+ggntuple->Draw("mass>>htemp2","mass<1.0&&chisq1<3.0&&chisq2<3.0");
+  
+canvas1_3->SetLogy();
+canvas1_3->cd();
+
+htemp2->SetLineColor(2);
+htemp1->Draw();
+htemp2->Draw("same");
+\end{lstlisting}
+\noindent
+For characteristic results see Fig.~\ref{fig:invmass}.  The left panel
+shows the \mgg distribution in the MB data (no cut on \pt or any
+other observable).  While the true \piz peak dominates (0.135\,\gev),
+there is a pronounced peak at 0.03\,\gev (primarily due to 
+``minimum ionization'' hadrons),
+also, the combinatorial background under the true \piz peak is
+substantial.  The middle panel is the same \mgg distribution from the
+ERT data.  The fake peak at 0.03\,\gevc is gone, the combinatorial
+background is much smaller, and now you clearly see the peak at the
+$\eta$ meson mass as well.  The right panel is once again MB data; the
+blue histogram is the (uncut) \mgg (same as on the left panel), the
+red is the same \mgg if we require that both clusters of the pair
+satisfy the $\chi^2<3$ condition (i.e. are consistent with the photon
+cluster shape).  Note the log scale.  As you can see, the cut on
+``photonness'' leaves the \piz peak area nearly unchanged, but reduces
+the combinatorial background drastically.
 
 
+\begin{center}
+\begin{figure}[htbp]
+  \includegraphics[width=0.33\linewidth]{figs/mbinvmass.png}
+  \includegraphics[width=0.33\linewidth]{figs/ertinvmass.png}
+  \includegraphics[width=0.33\linewidth]{figs/chi2mbinvmass.png}
+  \caption{Left panel: Invariant mass from the MB data
+    in the 0-1\,\gev region.  You can see a strong \piz peak
+    and maybe a hint of $\eta$.
+    Middle panel: \piz peak for pairs 
+    from the ERT data (i.e. the pair \pt is greater than 8\,\gevc.  
+    The combinatorial background is much smaller and the $\eta$ peak
+    is now clearly seen.
+    Right panel: the effect of a strong $\chi^2$ cut on the photon
+    pairs in the MB data.  The blue histogram is the same as in the
+    left panel, the red is with the $\chi^2$ cut on both clusters.
+    While you barely lose any signal (due to the small inefficiency of
+    the cut), the signal to background ratio improves dramatically.
+  }
+    \label{fig:invmass}
+\end{figure}
+\end{center}
+
+\subsubsection{Asymmetry}
+The (energy) asymmetry of the two \piz decay photons is a flat
+distribution by kinematics (at least in $4\pi$ solid angle).  This
+offers another opportunity to improve the signal/background ratio when
+extracting the \piz-s.   
+In the left panel of Fig.~\ref{fig:asym_pt} the asymmetry distribution
+of all \mgg pairs is shown (MB data).  The enhancement at high
+asymmetries comes from the abundant low \pt photons and hadrons
+depositing small energy - i.e. non-\piz, combinatorial background
+pairs.  By applying a modest, say $\alpha<0.6$ asymmetry cut the S/B
+ratio can be significantly improved at a small cost of lost true
+\piz-s, as demonstrated in the right panel of Fig.~\ref{fig:asym_pt}. 
+The ROOT commands are here:
+
+\begin{lstlisting}
+ggntuple->Draw("asym","mass<1.0");
+ggntuple->Draw("mass>>htemp1","mass<1.0");
+ggntuple->Draw("mass>>htemp2","mass<1.0&&asym<0.6");
+htemp1->Draw();
+htemp2->Draw("same");
+\end{lstlisting}
+
+
+\begin{center}
+\begin{figure}[htbp]
+  \includegraphics[width=0.4\linewidth]{figs/mbasym.png}
+  \includegraphics[width=0.4\linewidth]{figs/mbinvmassasym.png}
+  \caption{MB data, plots from the pair ntuple.  Left panel: energy
+    asymmetry distribution for all pairs.  
+    Right panel: invariant mass distribution without asymmetry cut
+    (i.e. with the default $\alpha<0.8$) and with a tighter
+    $\alpha<0.6$ cut (red histogram.  The signal to combinatorial
+    background ratio is significantly improved.
+  }
+    \label{fig:asym_pt}
+\end{figure}
+\end{center}
+
+\subsubsection{\textbf{$p_T$}}
+Let's make a crude estimate of the {\it raw} \piz and $\eta$ spectrum,
+i.e. the pair \pt distribution of those pairs which give an invariant
+mass in the \piz or $\eta$ ``mass window''.  The estimate will be
+crude because we don't attempt to account for the combinatorial
+background.  However, we can try to clean up the spectra by making a
+cut on the ``photonness'' of both clusters.  This is illustrated in
+Fig.~\ref{fig:pizeta_pt} for \piz in both MB and ERT data, and $\eta$
+(ERT only).  The blue histograms are the \pt distribution of pairs in
+the mass window, the red histoes the same but with an additional cut
+on the {\it chisq} variables.  The principal commands:
+\begin{lstlisting}
+ggntuple->Draw("pt","abs(mass-0.135)<0.015");
+ggntuple->Draw("pt","abs(mass-0.135)<0.015&&chisq1<3.0&&chisq2<3.0");
+ggntuple->Draw("pt","abs(mass-0.548)<0.1");
+ggntuple->Draw("pt","abs(mass-0.548)<0.1&&chisq1<3.0&&chisq2<3.0");
+\end{lstlisting}
+\noindent
+Note that the mass window for \piz is much narrower than for $\eta$.
+In the MB \piz spectra at low \pt the {\it chisq} cut eliminates 
+some 20-30\% of \piz counts (red vs blue histogram), in line with what
+the left plot in Fig.~\ref{fig:invmass} suggests (the estimated
+magnitude of the combinatorial background).  In ERT there is very
+little change, again in line with the small combinatorial on the
+middle panel in Fig.~\ref{fig:invmass}.  Finally, for $\eta$ there is
+a significant drop in the yields for the entire (high \pt) spectrum,
+in line with the large combinatorial (as compared to the small peak)
+in Fig~\ref{fig:invmass}.  Also, the spurios ``flattening'' at very
+high \pt in the blue histogram is completely gone.
+
+\begin{center}
+\begin{figure}[htbp]
+  \includegraphics[width=0.33\linewidth]{figs/mbpi0pt.png}
+  \includegraphics[width=0.33\linewidth]{figs/ertpi0pt.png}
+  \includegraphics[width=0.33\linewidth]{figs/ertetapt.png}
+  \caption{Transverse momentum (\pt) distributions of photon candidate
+    pairs in the \piz window (top panels) and $\eta$ window (bottom
+    panel).  Blue histograms: \pt for all pairs (no identification of
+    the cluster as photon).  Red histograms: \pt for pairs where both
+    clusters satisfy the {\it chisq} ``photonness'' criterion.
+    Left: MB data, center and right: ERT data.
+  }
+    \label{fig:pizeta_pt}
+\end{figure}
+\end{center}
+
+\subsubsection{TOF}
+As stated earlier, the time-of-flight ({\it tof}) for clusters is
+readjusted such that it will be zero for true photons.  In the left
+panel of Fig.~\ref{fig:playtof} for cluster pairs which have an \mgg
+in the \piz window we plot {\it tof} values vs each other.  True
+\piz-s are in the big peak at (0,0).  If we now look at the horizontal
+band to the right of the peak, the first cluster is still likely to be
+a photon (small {\it tof}), but the second is more likely to be a
+hadron.  Is this reflected in other observables characterizing the
+clusters, too?  The answer is yes: on the right panel in
+Fig.~\ref{fig:playtof} we plot the ``photonness'' variables 
+{\it chisq1} in blue, {\it chisq2} in red.  The second cluster,
+presumed hadronic, has on average higher {\it chisq2} value.
+
+There is one more important lesson to be learned here.  Real-life
+analyses are complicated.  There is no ``silver bullet'', single cut,
+that, by miracle, selects {\it all} photons and nothing else.
+Cuts are characterized by their {\it efficiency} (how much of the
+desired signal they preserve) and {\it contamination} (how much of the
+undesired signal passes).  Tighter cuts may reduce contamination, but
+always at the cost of efficiency.  The art of analysis is to optimize
+the signal/background, without sacrificing too much signal.
+This is usually achieved by combining different cuts with AND or even
+OR operations.  In the last decades probabilistic approaches of
+combining cuts are also gaining ground.
+
+\begin{lstlisting}
+ggntuple->Draw("tof1:tof2","abs(mass-0.135)<0.015&&abs(tof1)<20.0&&abs(tof2)<20.0","colz");
+TH1D *hsmall = new TH1D("hsmall","hsmall",60,0.0,30.0);
+TH1D *hlarge = new TH1D("hlarge","hlarge",60,0.0,30.0);
+ggntuple->Draw("chisq1>>hsmall","abs(mass-0.135)<0.015&&abs(tof1)<3.0&&abs(tof2)>5.0");
+ggntuple->Draw("chisq2>>hlarge","abs(mass-0.135)<0.015&&abs(tof1)<3.0&&abs(tof2)>5.0");
+hlarge->SetLineColor(2);
+hlarge->SetLineWidth(2);
+hsmall->SetLineWidth(2);
+hsmall->Draw();
+hlarge->Draw("same");
+\end{lstlisting}
+
+\begin{center}
+\begin{figure}[htbp]
+  \includegraphics[width=0.45\linewidth]{figs/mbtof1tof2.png}
+  \includegraphics[width=0.45\linewidth]{figs/mbchi1chi2.png}
+  \caption{Left panel: time-of-flight values of two clusters which
+    produce an invariant mass in the \piz window.  TOF for true
+    photons is per construction around zero so the true
+    (non-combinatorial) pairs are in the sharp peak at (0,0).
+    Right panel: {\it chisq} (``photonness'') of the clusters in the
+    horizontal band above the main peak at (0,0).  Blue histogram is
+    {\it chisq1} of the presumed true photon, the red histogram is the
+    {\it chisq2} of the presumed hadron.  See text for more details.
+  }
+    \label{fig:playtof}
+\end{figure}
+\end{center}
+
+\subsection{Single Clusters (macro: \textit{single\_cluster.C})}
+\subsubsection{Cluster Position}
+Let's turn to single clusters (photon candidates, {\it gnt} Ntuple),
+and look first at the position of the clusters (assumed impact point)
+in a particular sector.  In Fig.~\ref{fig:deadhot} the $y,z$ positions
+of the clusters are shown from MB and ERT data.  The depletion at the
+edges is due to the algorithm (clusters too close to the edge are not
+reconstructed because energy may leak out and the resulting 
+{\it  ecore} will be incorrect).  The white areas represent ``dead''
+channels that never fire, and the blue areas have only few hits,
+although our expectation is that the clusters should be approximately
+uniformly distributed over the sector.  Such dead or low-sensitivity
+areas should be taken account in a real analysis when the acceptance
+and efficiency of the detector are calculated.
+
+\begin{lstlisting}
+TFile* mb = new TFile("MBntup_gnt.root");
+TFile* ert = new TFile("ERTntup_gnt.root");
+
+int W=1200;
+int H=400;
+
+TCanvas *canvas1  = new TCanvas("canvas1",  "Cluster position", W, H);
+canvas1->Divide(2,1);
+
+mb->cd();
+canvas1_1->cd();
+gnt->Draw("y:z","sec==1","colz");
+
+ert->cd();
+canvas1_2->cd();
+gnt->Draw("y:z","sec==1","colz");
+\end{lstlisting}
+
+
+\begin{center}
+\begin{figure}[htbp]
+  \includegraphics[width=0.4\linewidth]{figs/mbsec1_yz.png}
+  \includegraphics[width=0.4\linewidth]{figs/ertsec1_yz.png}
+  \caption{Position of cluster centers (calculated impact point) in
+    sector 1 (PbSc West).  Left panel: MB data.  Right panel: ERT data.
+  }
+    \label{fig:deadhot}
+\end{figure}
+\end{center}
+
+\subsubsection{Selecting photons with the $\chi^2$ cut }
+Unfortunately not all clusters in {\it gnt} are photons.  The 
+{\it chisq} variable is an estimate of the ``photonness'' based on a
+parametrized shower profile, but its detailed description is beyond
+the scope of this write-up.  However, it is interesting to look at the
+compactness of the shower.  Electromagnetic showers are narrow, most
+of the energy is deposited in a single tower, while
+hadronic showers are fairly wide.  Besides the total energy 
+({\it ecore}) the Ntuple also stores the energy in the ``central''
+(most energetic) tower ({\it ecent}).  The ratio
+{\it ecent/ecore} is expected to be high for photons, lower for
+hadrons.  In Fig.~\ref{fig:ecentecore} this ratio is plotted versus
+the total energy for MB data, first without any other cuts, then
+cutting on the {\it chisq} variable, first deliberately selecting 
+``photon-like'' showers, then ``un-photon-like'' showers.  Without
+cuts the {\it ecent/ecore} has two characteristic peaks, which then
+get almost perfectly resolved by the ``photon - not photon'' cut.  Of
+course that also means that {\it ecent/ecore} in its own right can be
+a powerful cut to select photons. 
+
+\begin{lstlisting}
+mb->cd();
+TCanvas *canvas2  = new TCanvas("canvas2",  "ecent/ecore:ecore", 3*W/2, H);
+canvas2->Divide(3,1);
+
+canvas2_1->cd();
+gnt->Draw("ecent/ecore:ecore","ecore<4.0","colz");
+
+canvas2_2->cd();
+gnt->Draw("ecent/ecore:ecore","ecore<4.0&&chisq<3.0","colz");
+
+canvas2_3->cd();
+gnt->Draw("ecent/ecore:ecore","ecore<4.0&&chisq>5.0","colz");
+\end{lstlisting}
+
+
+\begin{center}
+\begin{figure}[htbp]
+  \includegraphics[width=0.3\linewidth]{figs/mbcentcore_nocut.png}
+  \includegraphics[width=0.3\linewidth]{figs/mbcentcore_chilt3.png}
+  \includegraphics[width=0.3\linewidth]{figs/mbcentcore_chigt5.png}
+  \caption{Shower compactness ({\it ecent/ecore}) vs shower energy in
+    MB data.  Left panel: no cuts.  There is a characteristic
+    double-peak structure.  Using the {\it chisq} (``photonness'')
+    variable on the middle panel we select showers that are likely
+    photons (small {\it chisq}), 
+    on the right panel clusters that are most likely not
+    photons (large {\it chisq}).  The compactness variable is quite powerful
+    distinguishing between them (i.e. for photon identification).
+  }
+    \label{fig:ecentecore}
+\end{figure}
+\end{center}
+
+\subsubsection{The effect of the $\chi^2$ cut on the $p_T$ spectra}
+As mentioned before, the {\it chisq} variable is a powerful tool to
+enhance photons and reject hadrons in the sample.  In 
+Fig.~\ref{fig:ertgntpt} we plot the \pt distribution of the clusters
+in the ERT data sample, first with no cut (blue histogram), then with
+a cut on {\it chisq} (red histogram).  Without the cut, the spectrum
+spectrum ``flattens out'' at high \pt, which is non-physical.  The
+effect of the cut becomes visible early on, and will be quite dramatic
+above 15\,\gevc.  Up to about 25\,\gevc the red histogram shows the
+expected power-law shape, above that it also flattens out.  You may
+try to cut also on other {\it gnt} variables to get rid of the
+nonphysical flat part of the red histogram.
+
+
+\begin{lstlisting}
+TH1D *h1 = new TH1D("h1","h1",100,0.0,50.0);
+TH1D *h2 = new TH1D("h2","h2",100,0.0,50.0);
+h1->SetLineWidth(2.0);
+h2->SetLineWidth(2.0);
+h2->SetLineColor(2);
+gnt->Draw("pt>>h1","");
+gnt->Draw("pt>>h2","chisq<3.0");
+h1->Draw();
+h2->Draw("same");
+\end{lstlisting}
+
+
+\begin{center}
+\begin{figure}[htbp]
+  \includegraphics[width=0.5\linewidth]{figs/ertgntpt}
+  \caption{Blue histogram: \pt spectrum from the ERT data, 
+    {\it gnt} ntuple.  Red spectrum: same, but with a cut on
+    ``photonness'' ({\it chisq}).  Much - albeit not all - of the
+    nonphysical flattening at high \pt is gone.
+  }
+  \label{fig:ertgntpt}
+\end{figure}
+\end{center}
+\subsection{Final words}
+Please continue to play with the data!  The variables in the ntuples
+are there for a reason!  Try plotting them against each other, making
+them part of cuts when you plot a spectrum.  Make invariant mass plots
+in bins of pair \pt, fit the combinatorial background with some simple
+function (first, second order polynomial) and try to get a ``clean''
+raw \piz yield as a function of \pt.  Try to imagine in advance, what
+effect a cut would have, then actually make it and compare the result
+with your expectations.  If you are open-minded and play creatively
+with them, {\it the data will start speaking to you and telling you
+how to analyze them}.
+
+\vspace{0.2in}
+
+\noindent
+{\bf Have fun!}
 
 
 \end{document}
