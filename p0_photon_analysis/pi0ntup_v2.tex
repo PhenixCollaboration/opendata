@@ -23,7 +23,8 @@
 \newcommand{\gevc}{\mbox{GeV/$c$}\xspace}
 \newcommand{\mgg}{\mbox{$m_{\gamma\gamma}$}\xspace}
 
-\title{Neutral meson and photon ntuples derived from PHENIX Data: explanation and examples}
+\title{Examples of Basic Analysis Techniques for Neutral Meson and Photon
+Data from the PHENIX Detector}
 \date{\today}
 \author{G.\,David\\
 { \it Stony Brook University, Brookhaven National Laboratory}}
@@ -34,14 +35,14 @@
 
 \begin{abstract}
 \noindent  This writeup is a part of an Analysis Preservation and educational
- package with a focus  on the Electromagnetic Calorimeter (EMCal) of the PHENIX
-detector. It aims to present a few basic techniques
+ package with specific focus  on the Electromagnetic Calorimeter (EMCal)
+of the PHENIX detector. It aims to present a few basic techniques
 of identifying $\pi^0$-s and photons using that device.
 The data component of this package is provided in the form of ROOT files
 containing small samples of reconstructed $p$+Au data taken with the PHENIX detector
 in 2015 at \sqsn=200\,GeV.  Both minimum bias and EMCal-triggered data are included.
 \textit{These samples were created for educational and training purposes only and are not at
-all useable for deriving any real physics results.}
+all usable for deriving any real physics results.}
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -78,9 +79,9 @@ nanoseconds, distance in centimeters and energy in GeV.
 \section{Contents of the Package}
 The package described here contains
 \begin{itemize}
-\item this writeup
-\item four ROOT-formatted data files as described in Sec.\ref{data}
-\item two ROOT macros described in Sec.\ref{code}
+\item This writeup (file: "pi0ntup\_v2.pdf")
+\item Four ROOT-formatted data files as described in Sec.\ref{data}
+\item Two ROOT macros designed to manipulate these data, as described in Sec.\ref{code}
 \end{itemize}
 
 \noindent
@@ -88,6 +89,20 @@ The ROOT macros and this document (pi0ntup\_v2.pdf) can be located on GitHub:
 \begin{verbatim}
 https://github.com/PhenixCollaboration/opendata/tree/master/p0_photon_analysis
 \end{verbatim}
+\noindent
+\textbf{Caveat:} the ROOT macros were developed in the standard PHENIX
+analysis environment which is based on ROOT version 5.34/36. You will need
+to make adjustments to the code to make it run under a more modern version e.g.\,version 6.
+Alternatively, you may obtain a Docker image of ROOT version 5.34 from
+the PHENIX Collaboration Organization on Docker Hub:
+\begin{verbatim}
+docker pull phenixcollaboration/tools:sl7_root5
+\end{verbatim}
+\noindent
+The data (e.g.\, the ROOT-formatted Ntuples) are available on the CERN OpenData
+portal and also can be obtained by request from the PHENIX Collaboration. Please visit https://www.phenix.bnl.gov
+for more detail.
+
 
 \section{The Data:  {\it gnt} and {\it ggntuple} Ntuples}
 \label{data}
@@ -117,7 +132,7 @@ them. Their purpose is to help you learn some basic techniques of
 particle identification (PID), practice making different cuts and
 estimate their effect, observe how the signal to background ratio
 can be improved at the expense of some loss in the signal and
-how to find an optimum between the two trends. 
+how to find an optimum between these two trends. 
 
 You may also learn that PID itself is
 also not an unambiguous procedure: you can apply much looser cuts on
@@ -138,7 +153,7 @@ photon PID cuts stricter, in order to increase {\it purity}
 expense of {\it efficiency}.
 
 \subsection{The Gamma-Gamma Ntuples \it{(ggnutple)}}
-The first Ntuple type is called {\it ggntuple} (gamma-gamma Ntuple).
+The first Ntuple type considered here is called {\it ggntuple} (gamma-gamma Ntuple).
 It contains information on EMCal cluster {\it pairs} and the two clusters
 in the pair (see Table~\ref{tab:ggntuple}).  In each event all
 clusters in a sector are paired with all other clusters, and the pair
@@ -194,9 +209,10 @@ meaning is spelled out below.
   \label{tab:ggntuple}
  \end{table}
 
-\subsection{The Cluster Ntuples \it{(gnt)}}
-The second Ntuple type is called {\it gnt} and contains information on
+\subsection{The Single Cluster Ntuples \it{(gnt)}}
+The second Ntuple type is called {\it gnt}. It contains information on
 individual clusters (again, many of which are {\it not} photons!).
+Please see Table \ref{tab:gnt} for description of individual variables.
 Here {\it pt} is the transverse momentum of the (single) particle,
 calculated under the assumption that it is a photon (straight path
 from the collision vertex and $p=E$), {\it costheta} is the cosine of
@@ -205,21 +221,21 @@ number (0-5 are lead scintillator sectors, PbSc, 6-7 are lead glass,
 PbGl).  For both detectors the smallest, individually read out units
 are called {\it towers}.
 
-The field {\it ecore} is an estimate of the particle energy (using various
+The variable {\it ecore} is an estimate of the particle energy (using various
 corrections to account for detector effects), {\it ecent} is the
 energy in the central (highest energy) tower of the cluster, 
 {\it tof} is the time-of-flight measured in the central tower and
 corrected with the flight-path $s/c$ such that for photons {\it tof}
-is a distribution around zero.  Based on testbeam data we have a model
-(parametrization) of electromagnetic showers depending on energy, impact
+is a distribution around zero.  Based on test beam data we have a model
+(parameterization) of electromagnetic showers depending on energy, impact
 point and angle of the photon; the {\it chisq} is calculated as the
 deviation of the actual shower (energy deposit pattern in the towers)
 from the ``model'' shower of the same energy, impact point and angle.
 The {\it prob} is calculated from this $\chi^2$, usually showers with
-$prob>0.05$ are very likely indeed photons;  {\it disp} is the 2D
-dispersion, {\it twrhit} is the number of towers hit (i.e. included in
-the cluster), finally {\it stoch} is a combination of various
-probability measures to characterize ``photonness'', higher values
+$prob>0.05$ are very likely to be photons;  {\it disp} is the 2D
+dispersion, {\it twrhit} is the number of towers hit (i.e.\,included in
+the cluster). Finally, {\it stoch} is a combination of various
+probability metrics to characterize ``photonness'', higher values
 mean higher probability that the cluster is indeed a photon.  The
 calculated impact point of the particle is given as $x,y,z$ in the
 PHENIX absolute coordinate system ($x>0$ is the West Arm, negative $z$
@@ -467,7 +483,8 @@ This is usually achieved by combining different cuts with AND or even
 OR operations.  In the last decades probabilistic approaches of
 combining cuts are also gaining ground.
 
-\begin{lstlisting}
+
+\begin{lstlisting}[basicstyle=\scriptsize]
 ggntuple->Draw("tof1:tof2","abs(mass-0.135)<0.015&&abs(tof1)<20.0&&abs(tof2)<20.0","colz");
 TH1D *hsmall = new TH1D("hsmall","hsmall",60,0.0,30.0);
 TH1D *hlarge = new TH1D("hlarge","hlarge",60,0.0,30.0);
@@ -479,6 +496,7 @@ hsmall->SetLineWidth(2);
 hsmall->Draw();
 hlarge->Draw("same");
 \end{lstlisting}
+
 
 \begin{center}
 \begin{figure}[htbp]
