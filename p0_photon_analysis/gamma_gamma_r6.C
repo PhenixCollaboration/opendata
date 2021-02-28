@@ -92,7 +92,6 @@ void gamma_gamma(TString option, TString MBntup="MBntup_ggntuple.root", TString 
    htemp6->SetLineColor(2);
    htemp6->Draw("same");
 
-//     ert->cd();
    canvas3->cd(1)->cd(2);
    canvas3->GetPad(1)->GetPad(2)->SetLogy();
    ggntuple_ert->Draw("pt>>htemp7","abs(mass-0.135)<0.015");
@@ -119,8 +118,6 @@ void gamma_gamma(TString option, TString MBntup="MBntup_ggntuple.root", TString 
    htemp10->Draw("same");
  }
  else if (option=="tof") {  // ########### tof
-//     mb->cd();
-
   TCanvas *canvas4  = new TCanvas("canvas4",  "Effect of the TOF cut", W, H);
   canvas4->Divide(2,1);
   canvas4->cd(1);
@@ -136,9 +133,6 @@ void gamma_gamma(TString option, TString MBntup="MBntup_ggntuple.root", TString 
   ggntuple_mb->Draw("chisq1>>hsmall","abs(mass-0.135)<0.015&&abs(tof1)<3.0&&abs(tof2)>5.0");
   ggntuple_mb->Draw("chisq2>>hlarge","abs(mass-0.135)<0.015&&abs(tof1)<3.0&&abs(tof2)>5.0");
 
-  //  TH1* hsmall = (TH1*) gDirectory->Get("hsmall");
-  //  TH1* hlarge = (TH1*) gDirectory->Get("hlarge");
-  
   hlarge->SetLineColor(2);
   hlarge->SetLineWidth(2);
   
