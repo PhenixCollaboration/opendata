@@ -7,7 +7,7 @@ A set of Ntuples derived from actual PHENIX data to be used within the
 context of this exercise is provided separately.
 
 * pi0ntup_v1 - the original "preview" version of the write-up based on files containing
-different types of ntuples; also requires "revtex" so the TeX siyrce won't compule on some systems.
+different types of ntuples; also requires "revtex" so the TeX source won't compile on some systems.
 * pi0ntup_v2 - simplified TeX source, takes into account refactored Ntuples and ROOT macros
 * gamma_gamma*.C - ROOT macros to use with gamma-gamma Ntuples (for ROOT5 and ROOT6)
 * single_cluster*.C - ROOT macroa to use with single cluster Ntuples (for ROOT5 and ROOT6)
