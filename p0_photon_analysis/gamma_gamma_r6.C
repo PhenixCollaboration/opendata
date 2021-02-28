@@ -2,6 +2,8 @@
 // This macro is intended to be used with ROOT files prepared
 // for the PHENIX Collaboration document titled
 // "Neutral meson and photon ntuples: explanation and examples".
+//
+// NB. This version is written for ROOT6
 // 
 // The files are: MBntup_ggntuple.root and ERTntup_ggntuple.root
 // They contain the so-called "gamma-gamma ntuple" referred to
