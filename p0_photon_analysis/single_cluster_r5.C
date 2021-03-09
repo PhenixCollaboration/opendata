@@ -2,7 +2,9 @@
 // This macro is intended to be used with ROOT files prepared
 // for the PHENIX Collaboration document titled
 // "Neutral meson and photon ntuples: explanation and examples".
-// 
+//
+// NB. This version is written for ROOT5
+//
 // The files are: MBntup_gnt.root and ERTntup_gnt.root
 // They contain the so-called "single cluster ntuple" referred to
 // as ggntuple in the code below.
@@ -16,11 +18,9 @@
 //
 // For exact semantics of each choice please see the PDF document
 // --------------------------------------------------------------
-void single_cluster(TString option, TString MBntup="MBntup_gnt.root", TString ERTntup="ERTntup_gnt.root") {
+void single_cluster_r5(TString option, TString MBntup="MBntup_gnt.root", TString ERTntup="ERTntup_gnt.root") {
   TFile* mb = new TFile(MBntup);
   TFile* ert = new TFile(ERTntup);
-
-  // Chi**2
 
   int W=1200;
   int H=400;
