@@ -39,7 +39,7 @@ Data from the PHENIX Detector}
 of the PHENIX detector. It aims to present a few basic techniques
 of identifying $\pi^0$-s and photons using that device.
 The data component of this package is provided in the form of ROOT files
-containing small samples of reconstructed $p$+Au data taken with the PHENIX detector
+containing small samples (Ntuples) of reconstructed $p$+Au data taken with the PHENIX detector
 in 2015 at \sqsn=200\,GeV.  Both minimum bias and EMCal-triggered data are included.
 \textit{These samples were created for educational and training purposes only and are not at
 all usable for deriving any real physics results.}
@@ -82,24 +82,28 @@ The package described here contains
 \begin{itemize}
 \item This writeup (file: "pi0ntup\_v2.pdf")
 \item Four ROOT-formatted data files as described in Sec.\ref{data}
-\item Two ROOT macros designed to manipulate these data, as described in Sec.\ref{code}
+\item Two ROOT macros designed to manipulate these data, as described in Sec.\ref{code}; each macro exists
+two versions created for ROOT5 and ROOT6
 \end{itemize}
 
 \noindent
 The ROOT macros and this document (pi0ntup\_v2.pdf) can be located on GitHub:
 \begin{verbatim}
-https://github.com/PhenixCollaboration/opendata/tree/master/p0_photon_analysis
+https://github.com/PhenixCollaboration/opendata/tree/master/pi0_photon_analysis
 \end{verbatim}
 \noindent
-\textbf{Caveat:} the ROOT macros were developed in the standard PHENIX
-analysis environment which is based on ROOT version 5.34/36. You will need
-to make adjustments to the code to make it run under a more modern version e.g.\,version 6.
-Alternatively, you may obtain a Docker image of ROOT version 5.34 from
-the PHENIX Collaboration Organization on Docker Hub:
+The ROOT macros were originally developed in the standard PHENIX
+analysis environment which is based on Scinetific Linux 7 abd ROOT version 5.34/36.
+The source files for these macros are named \textit{*\_r5.C}, while the newer and
+functionally equivalent ROOT6 versions are named \textit{*\_r6.C}.
+Should you choose to use ROOT5, a Docker image of ROOT version 5.34
+can be obtained from the PHENIX Collaboration Organization on
+Docker Hub:
 \begin{verbatim}
 docker pull phenixcollaboration/tools:sl7_root5
 \end{verbatim}
 \noindent
+Images for ROOT6 -- if needed - are trivial to obtain as well.
 The data (e.g.\, the ROOT-formatted Ntuples) are available on the CERN OpenData
 portal and also can be obtained by request from the PHENIX Collaboration. Please visit https://www.phenix.bnl.gov
 for more detail.
@@ -284,20 +288,23 @@ are subject to the condition that the asymmetry is less than 0.8.
 \label{code}
 
 \subsection{Access to the Code}
-The two ROOT macros named \textit{gamma\_gamma.C} and
-\textit{single\_cluster.C} can be downloaded from this GitHub location:
+The two ROOT macros named \textit{gamma\_gamma\_r*.C} and
+\textit{single\_cluster\_r*.C} are included in this package and alternatively
+can be downloaded from this GitHub location,
+in two versions corresponding to ROOT5 and ROOT6 (\textit{*\_r5.C} and
+\textit{*\_r6.C} respectively):
 \begin{verbatim}
-https://github.com/PhenixCollaboration/opendata/tree/master/p0_photon_analysis
+https://github.com/PhenixCollaboration/opendata/tree/master/pi0_photon_analysis
 \end{verbatim}
-\textit{Please see Sec.\ref{contents} for an importance notice regarding the ROOT
-version compatibility}.
+\noindent
 The macros were designed to be self-documenting and to produce a visually appealing
 result.
-In the following, we are using {\it paraphrased} fragments of the macros as the basis
+In the following, we are using {\it paraphrased fragments of the ROOT5 verions of the macros}
+as the basis
 for commentary (i.e. they may differ a little for illustration purposes). Feel free to
 run modified snippets of the code to get a feel of how it works with the data.
 
-\subsection{Cluster Pairs (macro: \textit{gamma\_gamma.C})}
+\subsection{Cluster Pairs (macro: \textit{gamma\_gamma\_r5.C})}
 \subsubsection{Effect of the $\chi^2$ cut on the invariant mass spectra}
 Below is a code sample demonstrating the effect of the $\chi^2$ cut.
 
@@ -518,7 +525,7 @@ hlarge->Draw("same");
 \end{figure}
 \end{center}
 
-\subsection{Single Clusters (macro: \textit{single\_cluster.C})}
+\subsection{Single Clusters (macro: \textit{single\_cluster\_5.C})}
 \subsubsection{Cluster Position}
 Let's turn to single clusters (photon candidates, {\it gnt} Ntuple),
 and look first at the position of the clusters (assumed impact point)
@@ -657,7 +664,7 @@ h2->Draw("same");
 \end{figure}
 \end{center}
 \subsection{Final words}
-Please continue to play with the data!  The variables in the ntuples
+Please continue to play with the data --  the variables in the ntuples
 are there for a reason!  Try plotting them against each other, making
 them part of cuts when you plot a spectrum.  Make invariant mass plots
 in bins of pair \pt, fit the combinatorial background with some simple
