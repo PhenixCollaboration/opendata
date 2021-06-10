@@ -23,8 +23,8 @@
 \newcommand{\gevc}{\mbox{GeV/$c$}\xspace}
 \newcommand{\mgg}{\mbox{$m_{\gamma\gamma}$}\xspace}
 
-\title{Examples of Basic Analysis Techniques for Neutral Meson and Photon
-Data from the PHENIX Detector}
+\title{Examples of basic analysis techniques for 
+    neutral meson and photon data from the PHENIX Detector}
 \date{\today}
 \author{G.\,David\\
 { \it Stony Brook University, Brookhaven National Laboratory}}
@@ -117,10 +117,10 @@ There are a total of four files which are a part of the package
 in which this document is included:
 \textit{
 \begin{itemize}
-\item MBntup\_ggntuple.root
-\item ERTntup\_ggntuple.root
-\item MBntup\_gnt.root
-\item ERTntup\_gnt.root
+\item MBntup\_ggntuple.root (733161 events)
+\item ERTntup\_ggntuple.root (160231 events)
+\item MBntup\_gnt.root (282125 events)
+\item ERTntup\_gnt.root (79791 events)
 \end{itemize}
 }
 \noindent
@@ -182,30 +182,32 @@ $$\alpha = \frac{|E_1-E_2|}{E_1+E_2}$$
 The rest of the variables describe the two clusters ({\it 1,2}), their
 meaning is spelled out below.
 
+Since ROOT allows only {\it float} in Ntuples, all variables are {\it float}. 
+
 \begin{table}[h]
-  \begin{tabular}{|l|l|} \hline
-    Variable name & Description \\ \hline
-    cent & Event centrality \\
-    vtxZ & $z$-vertex of the event \\
-    pt   & Transverse momentum of cluster {\it pair} ($\pi^0$
+  \begin{tabular}{|l|l|l|} \hline
+    Variable name & Type & Description \\ \hline
+    cent & float & Event centrality \\
+    vtxZ & float & $z$-vertex of the event \\
+    pt   & float & Transverse momentum of cluster {\it pair} ($\pi^0$
     candidate) \\
-    costheta & $cos$ of the opening angle between the two clusters \\    
-    phi & Azimuthal angle of the direction of the pair momentum
+    costheta & float & $cos$ of the opening angle between the two clusters \\    
+    phi & float & Azimuthal angle of the direction of the pair momentum
     (assumed $\pi^0$) \\
-    mass & Invariant mass calculated from the two clusters (energy and
+    mass & float & Invariant mass calculated from the two clusters (energy and
     position) \\
-    asym & Energy asymmetry ($|E_1-E_2|/(E_1+E_2)$) of the two clusters \\
-    sec1 & EMCal sector where the first cluster is \\
-    Ecore1 & ``Core'' energy of the first cluster \\
-    tof1   & Time-of-flight of the first cluster \\
-    twrhit1 & Number of towers in the first cluster \\
-    prob1 & Probability that the first cluster is a photon (based on
+    asym & float & Energy asymmetry ($|E_1-E_2|/(E_1+E_2)$) of the two clusters \\
+    sec1 & float & EMCal sector where the first cluster is \\
+    Ecore1 & float & ``Core'' energy of the first cluster \\
+    tof1   & float & Time-of-flight of the first cluster \\
+    twrhit1 & float & Number of towers in the first cluster \\
+    prob1 & float & Probability that the first cluster is a photon (based on
     $\chi^2$) \\
-    chisq1 & $\chi^2$ from expected photon shape for the first cluster
+    chisq1 & float & $\chi^2$ from expected photon shape for the first cluster
     \\
-    stoch1 & Combined variable to describe ``photonness'' of first
+    stoch1 & float & Combined variable to describe ``photonness'' of first
     cluster \\
-    sec2 & ...  Same quantities as above for the second cluster of the
+    sec2 & float & ...  Same quantities as above for the second cluster of the
     pair \\ \hline
   \end{tabular}
   \vspace{0.3cm}
@@ -258,25 +260,25 @@ be (and often is) significantly lower.
 are subject to the condition that the asymmetry is less than 0.8.
 
 \begin{table}[h]
-  \begin{tabular}{|l|l|} \hline
-    Variable name & Description \\ \hline
-    cent & Event centrality \\
-    vtxZ & $z$-vertex of the event \\
-    pt   & Transverse momentum of the cluster ($\gamma$-candidate) \\
-    costheta & Polar angle of the cluster ($\gamma$-candidate) \\    
-    phi & Azimuthal angle of the cluster ($\gamma$-candidate) \\
-    sec & EMCal sector of the cluster ($\gamma$-candidate) \\
-    ecore & ``Core'' energy of the cluster ($\gamma$-candidate) \\
-    ecent & Energy in the central tower of the cluster ($\gamma$-candidate) \\
-    tof   & Time-of-flight in the central tower of the cluster ($\gamma$-candidate) \\
-    prob & Probability that the cluster is a photon (based on $\chi^2$) \\
-    disp & Dispersion of the cluster ($\gamma$-candidate) \\
-    chisq & $\chi^2$ from expected photon shape of the cluster ($\gamma$-candidate) \\
-    twrhit & Number of towers in the cluster ($\gamma$-candidate) \\
-    stoch & Combined variable to describe ``photonness'' of the cluster ($\gamma$-candidate) \\
-    x & $x$-position of impact point on the EMCal surface \\
-    y & $y$-position of impact point on the EMCal surface \\
-    z & $z$-position of impact point on the EMCal surface \\ \hline
+  \begin{tabular}{|l|l|l|} \hline
+    Variable name & Type & Description \\ \hline
+    cent & float & Event centrality \\
+    vtxZ & float & $z$-vertex of the event \\
+    pt   & float & Transverse momentum of the cluster ($\gamma$-candidate) \\
+    costheta & float & Polar angle of the cluster ($\gamma$-candidate) \\    
+    phi & float & Azimuthal angle of the cluster ($\gamma$-candidate) \\
+    sec & float & EMCal sector of the cluster ($\gamma$-candidate) \\
+    ecore & float & ``Core'' energy of the cluster ($\gamma$-candidate) \\
+    ecent & float & Energy in the central tower of the cluster ($\gamma$-candidate) \\
+    tof   & float & Time-of-flight in the central tower of the cluster ($\gamma$-candidate) \\
+    prob & float & Probability that the cluster is a photon (based on $\chi^2$) \\
+    disp & float & Dispersion of the cluster ($\gamma$-candidate) \\
+    chisq & float & $\chi^2$ from expected photon shape of the cluster ($\gamma$-candidate) \\
+    twrhit & float & Number of towers in the cluster ($\gamma$-candidate) \\
+    stoch & float & Combined variable to describe ``photonness'' of the cluster ($\gamma$-candidate) \\
+    x & float & $x$-position of impact point on the EMCal surface \\
+    y & float & $y$-position of impact point on the EMCal surface \\
+    z & float & $z$-position of impact point on the EMCal surface \\ \hline
   \end{tabular}
   \vspace{0.3cm}
   \caption{Variables in the single-cluster ($\gamma$) Ntuple (the {\it gnt} type).
